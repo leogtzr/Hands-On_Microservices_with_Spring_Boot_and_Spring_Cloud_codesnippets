@@ -1,0 +1,39 @@
+-> Service Discovery <-
+	Netflix, Eureka, Netflix Ribbon
+	Kubernetes kube-proxy
+
+-> Edge Server <-
+	Spring Cloud
+	Spring Security
+	Spring OAuth
+	Kubernetes Ingress Controller
+	Istio Ingress Gateway
+
+-> Reactive Microservices <-
+	Spring Reactor
+	Spring WebFlux
+
+-> Central Configuration <-
+	Spring Config Server
+	Kubernetes ConfigMaps and Secrets
+
+-> Centralized log analysis <-
+	Elasticsearch, Fluentd, Kibana
+
+-> Distributed tracing <-
+	Spring Cloud
+	Sleuth
+	Zipkin
+	Jaeger
+
+-> Circuit Breaker <-
+	Resilience4j
+	Outlier Detection (Istio)
+
+-> Control Loop <-
+	Kubernetes and controller manager
+
+-> Centralized monitoring and alarms <-
+	Grafana
+	Prometheus
+	Kiali (Istio)
