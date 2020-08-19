@@ -11,6 +11,7 @@ import java.net.UnknownHostException;
 
 @Component
 public class ServiceUtil {
+
     private static final Logger LOG = LoggerFactory.getLogger(ServiceUtil.class);
 
     private final String port;
@@ -18,9 +19,7 @@ public class ServiceUtil {
     private String serviceAddress = null;
 
     @Autowired
-    public ServiceUtil(
-        @Value("${server.port}") String port) {
-
+    public ServiceUtil(@Value("${server.port}") String port) {
         this.port = port;
     }
 
@@ -34,7 +33,7 @@ public class ServiceUtil {
     private String findMyHostname() {
         try {
             return InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
+        } catch (final UnknownHostException ex) {
             return "unknown host name";
         }
     }
@@ -42,7 +41,7 @@ public class ServiceUtil {
     private String findMyIpAddress() {
         try {
             return InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
+        } catch (final UnknownHostException ex) {
             return "unknown IP address";
         }
     }
