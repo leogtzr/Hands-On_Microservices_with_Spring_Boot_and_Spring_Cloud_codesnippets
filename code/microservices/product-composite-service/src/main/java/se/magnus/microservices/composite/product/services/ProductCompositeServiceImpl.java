@@ -6,6 +6,7 @@ import se.magnus.api.composite.product.*;
 import se.magnus.api.core.product.Product;
 import se.magnus.api.core.recommendation.Recommendation;
 import se.magnus.api.core.review.Review;
+import se.magnus.util.exceptions.NotFoundException;
 import se.magnus.util.http.ServiceUtil;
 
 import java.util.List;
@@ -15,19 +16,24 @@ import java.util.stream.Collectors;
 public class ProductCompositeServiceImpl implements ProductCompositeService {
 
     private final ServiceUtil serviceUtil;
-    private ProductCompositeIntegration integration;
+    private  ProductCompositeIntegration integration;
 
     @Autowired
-    public ProductCompositeServiceImpl(final ServiceUtil serviceUtil, final ProductCompositeIntegration integration) {
+    public ProductCompositeServiceImpl(ServiceUtil serviceUtil, ProductCompositeIntegration integration) {
         this.serviceUtil = serviceUtil;
         this.integration = integration;
     }
 
     @Override
-    public ProductAggregate getProduct(final int productId) {
-        final Product product = this.integration.getProduct(productId);
-        final List<Recommendation> recommendations = integration.getRecommendations(productId);
-        final List<Review> reviews = integration.getReviews(productId);
+    public ProductAggregate getProduct(int productId) {
+
+        Product product = integration.getProduct(productId);
+        if (product == null) throw new NotFoundException("No product found for productId: " + productId);
+
+        List<Recommendation> recommendations = integration.getRecommendations(productId);
+
+        List<Review> reviews = integration.getReviews(productId);
+
         return createProductAggregate(product, recommendations, reviews, serviceUtil.getServiceAddress());
     }
 
@@ -40,15 +46,15 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
 
         // 2. Copy summary recommendation info, if available
         List<RecommendationSummary> recommendationSummaries = (recommendations == null) ? null :
-                recommendations.stream()
-                        .map(r -> new RecommendationSummary(r.getRecommendationId(), r.getAuthor(), r.getRate()))
-                        .collect(Collectors.toList());
+             recommendations.stream()
+                .map(r -> new RecommendationSummary(r.getRecommendationId(), r.getAuthor(), r.getRate()))
+                .collect(Collectors.toList());
 
         // 3. Copy summary review info, if available
         List<ReviewSummary> reviewSummaries = (reviews == null)  ? null :
-                reviews.stream()
-                        .map(r -> new ReviewSummary(r.getReviewId(), r.getAuthor(), r.getSubject()))
-                        .collect(Collectors.toList());
+            reviews.stream()
+                .map(r -> new ReviewSummary(r.getReviewId(), r.getAuthor(), r.getSubject()))
+                .collect(Collectors.toList());
 
         // 4. Create info regarding the involved microservices addresses
         String productAddress = product.getServiceAddress();
@@ -58,5 +64,4 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
 
         return new ProductAggregate(productId, name, weight, recommendationSummaries, reviewSummaries, serviceAddresses);
     }
-
 }
