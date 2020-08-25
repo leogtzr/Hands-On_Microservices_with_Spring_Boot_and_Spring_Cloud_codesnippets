@@ -19,7 +19,7 @@ apply plugin: 'io.spring.dependency-management'
 
 group = 'se.magnus.microservices.core.product'
 version = '1.0.0-SNAPSHOT'
-sourceCompatibility = 12
+sourceCompatibility = 14
 
 repositories {
 	mavenCentral()

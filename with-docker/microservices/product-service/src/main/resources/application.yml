@@ -5,7 +5,7 @@ logging:
     root: INFO
     se.magnus: DEBUG
 
-# Multiple
+# Multiple 
 
 ---
 spring.profiles: docker
