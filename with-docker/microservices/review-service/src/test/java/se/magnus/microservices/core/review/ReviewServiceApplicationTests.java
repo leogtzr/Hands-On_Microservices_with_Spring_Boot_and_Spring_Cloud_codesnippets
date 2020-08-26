@@ -11,7 +11,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment=RANDOM_PORT)
@@ -44,10 +43,10 @@ public class ReviewServiceApplicationTests {
 			.accept(APPLICATION_JSON_UTF8)
 			.exchange()
 			.expectStatus().isEqualTo(BAD_REQUEST)
-			.expectHeader().contentType(APPLICATION_JSON)
+			.expectHeader().contentType(APPLICATION_JSON_UTF8)
 			.expectBody()
 			.jsonPath("$.path").isEqualTo("/review")
-			.jsonPath("$.message").isEqualTo("");
+			.jsonPath("$.message").isEqualTo("Required int parameter 'productId' is not present");
 	}
 
 	@Test
@@ -58,10 +57,10 @@ public class ReviewServiceApplicationTests {
 			.accept(APPLICATION_JSON_UTF8)
 			.exchange()
 			.expectStatus().isEqualTo(BAD_REQUEST)
-			.expectHeader().contentType(APPLICATION_JSON)
+			.expectHeader().contentType(APPLICATION_JSON_UTF8)
 			.expectBody()
 			.jsonPath("$.path").isEqualTo("/review")
-			.jsonPath("$.message").isEqualTo("");
+			.jsonPath("$.message").isEqualTo("Type mismatch.");
 	}
 
 	@Test

@@ -16,10 +16,10 @@ logging:
     root: INFO
     se.magnus: DEBUG
 
-# Specific config for DOcker.
-
 ---
 spring.profiles: docker
+
+server.port: 8080
 
 app:
   product-service:
