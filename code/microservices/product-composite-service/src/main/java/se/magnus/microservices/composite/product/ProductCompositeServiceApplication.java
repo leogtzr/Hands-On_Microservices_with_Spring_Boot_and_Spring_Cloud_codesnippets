@@ -5,13 +5,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.client.RestTemplate;
+import springfox.documentation.swagger2.annotations.EnableSwagger2WebFlux;
 
+@EnableSwagger2WebFlux
 @SpringBootApplication
 @ComponentScan("se.magnus")
 public class ProductCompositeServiceApplication {
 
 	@Bean
-	RestTemplate restTemplate() {
+	public RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
 
