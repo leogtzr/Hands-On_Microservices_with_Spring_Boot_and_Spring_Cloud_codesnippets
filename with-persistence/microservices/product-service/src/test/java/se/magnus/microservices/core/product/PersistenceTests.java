@@ -10,6 +10,7 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 import se.magnus.microservices.core.product.persistence.ProductEntity;
 import se.magnus.microservices.core.product.persistence.ProductRepository;
@@ -25,6 +26,9 @@ import static org.springframework.data.domain.Sort.Direction.ASC;
 @RunWith(SpringRunner.class)
 @DataMongoTest
 public class PersistenceTests {
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @Autowired
     private ProductRepository repository;
