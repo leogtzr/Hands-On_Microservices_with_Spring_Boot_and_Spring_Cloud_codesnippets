@@ -22,4 +22,6 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
+reactive-1/.idea
+reactive-1/.gradle
 code-download/

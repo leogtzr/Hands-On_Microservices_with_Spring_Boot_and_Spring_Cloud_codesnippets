@@ -4,6 +4,7 @@ server.error.include-message: always
 # Strongly recommend to set this property to "none" in a production environment!
 spring.jpa.hibernate.ddl-auto: update
 
+# HikariCP is used by Spring Data JPA as the JDBC Connection Pool.
 spring.datasource:
   url: jdbc:mysql://localhost/review-db
   username: user
