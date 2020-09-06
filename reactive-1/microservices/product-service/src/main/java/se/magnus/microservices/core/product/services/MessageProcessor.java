@@ -30,22 +30,22 @@ public class MessageProcessor {
 
         switch (event.getEventType()) {
 
-        case CREATE:
-            Product product = event.getData();
-            LOG.info("Create product with ID: {}", product.getProductId());
-            productService.createProduct(product);
-            break;
+            case CREATE:
+                Product product = event.getData();
+                LOG.info("Create product with ID: {}", product.getProductId());
+                productService.createProduct(product);
+                break;
 
-        case DELETE:
-            int productId = event.getKey();
-            LOG.info("Delete recommendations with ProductID: {}", productId);
-            productService.deleteProduct(productId);
-            break;
+            case DELETE:
+                int productId = event.getKey();
+                LOG.info("Delete recommendations with ProductID: {}", productId);
+                productService.deleteProduct(productId);
+                break;
 
-        default:
-            String errorMessage = "Incorrect event type: " + event.getEventType() + ", expected a CREATE or DELETE event";
-            LOG.warn(errorMessage);
-            throw new EventProcessingException(errorMessage);
+            default:
+                String errorMessage = "Incorrect event type: " + event.getEventType() + ", expected a CREATE or DELETE event";
+                LOG.warn(errorMessage);
+                throw new EventProcessingException(errorMessage);
         }
 
         LOG.info("Message processing done!");

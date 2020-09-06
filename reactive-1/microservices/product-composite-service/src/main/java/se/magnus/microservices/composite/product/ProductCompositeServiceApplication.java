@@ -13,7 +13,9 @@ import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spring.web.plugins.Docket;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
@@ -68,16 +70,27 @@ public class ProductCompositeServiceApplication {
 	@Autowired
 	ProductCompositeIntegration integration;
 
+//	@Bean
+//	ReactiveHealthIndicator coreServices() {
+//		ReactiveHealthIndicatorRegistry registry = new DefaultReactiveHealthIndicatorRegistry(new LinkedHashMap<>());
+//
+//		registry.register("product", () -> integration.getProductHealth());
+//		registry.register("recommendation", () -> integration.getRecommendationHealth());
+//		registry.register("review", () -> integration.getReviewHealth());
+//
+//		return new CompositeReactiveHealthIndicator(healthAggregator,
+//				registry);
+//	}
+
 	@Bean
-	ReactiveHealthIndicator coreServices() {
+	public ReactiveHealthContributor coreServices() {
 
-		ReactiveHealthIndicatorRegistry registry = new DefaultReactiveHealthIndicatorRegistry(new LinkedHashMap<>());
+		final Map<String, ReactiveHealthIndicator> indicators = new HashMap<>();
+		indicators.put("product", () -> integration.getProductHealth());
+		indicators.put("recommendation", () -> integration.getRecommendationHealth());
+		indicators.put("review", () -> integration.getReviewHealth());
 
-		registry.register("product", () -> integration.getProductHealth());
-		registry.register("recommendation", () -> integration.getRecommendationHealth());
-		registry.register("review", () -> integration.getReviewHealth());
-
-		return new CompositeReactiveHealthIndicator(healthAggregator, registry);
+		return CompositeReactiveHealthContributor.fromMap(indicators);
 	}
 
 	public static void main(String[] args) {
