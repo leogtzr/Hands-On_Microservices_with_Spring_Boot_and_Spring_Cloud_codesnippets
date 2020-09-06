@@ -70,26 +70,27 @@ public class ProductCompositeServiceApplication {
 	@Autowired
 	ProductCompositeIntegration integration;
 
-//	@Bean
-//	ReactiveHealthIndicator coreServices() {
-//		ReactiveHealthIndicatorRegistry registry = new DefaultReactiveHealthIndicatorRegistry(new LinkedHashMap<>());
-//
-//		registry.register("product", () -> integration.getProductHealth());
-//		registry.register("recommendation", () -> integration.getRecommendationHealth());
-//		registry.register("review", () -> integration.getReviewHealth());
-//
-//		return new CompositeReactiveHealthIndicator(healthAggregator,
-//				registry);
-//	}
+	@Bean
+	ReactiveHealthIndicator coreServices() {
+		ReactiveHealthIndicatorRegistry registry = new DefaultReactiveHealthIndicatorRegistry(new LinkedHashMap<>());
+
+		registry.register("product", () -> integration.getProductHealth());
+		registry.register("recommendation", () -> integration.getRecommendationHealth());
+		registry.register("review", () -> integration.getReviewHealth());
+
+		return new CompositeReactiveHealthIndicator(healthAggregator,
+				registry);
+	}
 
 	@Bean
 	public ReactiveHealthContributor coreServices2() {
-		final Map<String, ReactiveHealthIndicator> services = new HashMap<>(3);
-		services.put("product", () -> integration.getProductHealth());
-		services.put("recommendation", () -> integration.getRecommendationHealth());
-		services.put("review", () -> integration.getReviewHealth());
+		final Map<String, ReactiveHealthIndicator> svcs = new HashMap<>(3);
 
-		return CompositeReactiveHealthContributor.fromMap(services);
+		svcs.put("product", () -> integration.getProductHealth());
+		svcs.put("recommendation", () -> integration.getRecommendationHealth());
+		svcs.put("review", () -> integration.getReviewHealth());
+
+		return CompositeReactiveHealthContributor.fromMap(svcs);
 	}
 
 	public static void main(String[] args) {
