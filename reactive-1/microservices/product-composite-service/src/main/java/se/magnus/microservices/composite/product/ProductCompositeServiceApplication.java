@@ -84,13 +84,13 @@ public class ProductCompositeServiceApplication {
 
 	@Bean
 	public ReactiveHealthContributor coreServices2() {
-		final Map<String, ReactiveHealthIndicator> svcs = new HashMap<>(3);
+		final Map<String, ReactiveHealthIndicator> inds = new HashMap<>(3);
 
-		svcs.put("product", () -> integration.getProductHealth());
-		svcs.put("recommendation", () -> integration.getRecommendationHealth());
-		svcs.put("review", () -> integration.getReviewHealth());
+		inds.put("product", () -> integration.getProductHealth());
+		inds.put("recommendation", () -> integration.getRecommendationHealth());
+		inds.put("review", () -> integration.getReviewHealth());
 
-		return CompositeReactiveHealthContributor.fromMap(svcs);
+		return CompositeReactiveHealthContributor.fromMap(inds);
 	}
 
 	public static void main(String[] args) {
