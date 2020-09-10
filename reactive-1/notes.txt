@@ -1,0 +1,6 @@
+To run it:
+
+1) gradle build
+2) docker-compose build
+3) docker-compose up -d
+

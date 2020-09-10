@@ -86,9 +86,9 @@ public class ProductCompositeServiceApplication {
 	public ReactiveHealthContributor coreServices2() {
 		final Map<String, ReactiveHealthIndicator> inds = new HashMap<>(3);
 
-		inds.put("product", () -> integration.getProductHealth());
-		inds.put("recommendation", () -> integration.getRecommendationHealth());
-		inds.put("review", () -> integration.getReviewHealth());
+		inds.put("product2", () -> integration.getProductHealth());
+		inds.put("recommendation2", () -> integration.getRecommendationHealth());
+		inds.put("review2", () -> integration.getReviewHealth());
 
 		return CompositeReactiveHealthContributor.fromMap(inds);
 	}
