@@ -1,0 +1,6 @@
+curl --request POST \
+ --url 'https://leogtzr.auth0.com/oauth/token' \
+ --header 'content-type: application/json' \
+ --data '{"grant_type":"password", "username":"leogutierrezramirez@gmail.com", "password":"lein23#___", "audience":"https://localhost:8443/product-composite", "scope":"openid email product:read product:write", "client_id": "DkdftGZ42651d3lB3aRL5x6dXCuVXrJR", "client_secret": "TbyG-YXS97RQ1hxFHIckecycinCZw63ChpsLpUOZgG5ouPLi3NL4RLJ0KAa1_pJl"}' -s
+
+

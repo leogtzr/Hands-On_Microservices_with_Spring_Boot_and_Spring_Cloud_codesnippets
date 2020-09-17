@@ -1,0 +1,14 @@
+Domain: leogtzr.auth0.com
+Client ID: DkdftGZ42651d3lB3aRL5x6dXCuVXrJR
+Client Secret: TbyG-YXS97RQ1hxFHIckecycinCZw63ChpsLpUOZgG5ouPLi3NL4RLJ0KAa1_pJl
+
+It should be:
+https://leogtzr.auth0.com
+
+
+To get some information about my tenant app:
+
+curl https://leogtzr.auth0.com/.well-known/openid-configuration -s | jq
+
+
+
