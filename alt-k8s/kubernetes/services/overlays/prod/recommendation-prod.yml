@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: product
+  name: recommendation
 spec:
   selector:
     matchLabels:
-      app: product
+      app: recommendation
   template:
     metadata:
       labels:
-        app: product
+        app: recommendation
     spec:
       containers:
-      - name: pro
-        image: hands-on/product-service:v2
+      - name: rec
+        image: hands-on/recommendation-service:v1
         env:
-        - name: SPRING_PROFILES_ACTIVE
-          value: "docker,prod"
+          - name: SPRING_PROFILES_ACTIVE
+            value: "docker,prod"
         resources:
           requests:
             memory: "200Mi"

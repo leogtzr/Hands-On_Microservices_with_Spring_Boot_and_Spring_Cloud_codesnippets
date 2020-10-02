@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: pro
-        image: hands-on/product-service:v2
+        image: hands-on/product-service:v1
         env:
         - name: SPRING_PROFILES_ACTIVE
           value: "docker,prod"

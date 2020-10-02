@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: product
+  name: product-composite
 spec:
   selector:
     matchLabels:
-      app: product
+      app: product-composite
   template:
     metadata:
       labels:
-        app: product
+        app: product-composite
     spec:
       containers:
-      - name: pro
-        image: hands-on/product-service:v2
+      - name: comp
+        image: hands-on/product-composite-service:v1
         env:
         - name: SPRING_PROFILES_ACTIVE
           value: "docker,prod"
