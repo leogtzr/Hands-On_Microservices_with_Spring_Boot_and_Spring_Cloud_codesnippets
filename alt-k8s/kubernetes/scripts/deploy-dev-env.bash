@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-alias | fgrep -i minikube kubectl
 
 # Print commands to the terminal before execution and stop the script if any error occurs
 set -ex

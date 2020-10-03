@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: edge-ngrok
@@ -7,21 +7,30 @@ metadata:
 spec:
   tls:
   - hosts:
-    - xxxxxxxx.ngrok.io
+    - f329d0696d26.ngrok.io 
     secretName: tls-ngrok-letsencrypt-certificate
   rules:
-  - host: xxxxxxxx.ngrok.io
+  - host: f329d0696d26.ngrok.io 
     http:
       paths:
       - path: /oauth
+        pathType: Exact
         backend:
-          serviceName: auth-server
-          servicePort: 80
+          service: 
+            name: auth-server
+            port:
+              number: 80
       - path: /product-composite
+        pathType: Exact
         backend:
-          serviceName: product-composite
-          servicePort: 80        
+          service:
+            name: product-composite
+            port: 
+              number: 80        
       - path: /actuator/health
+        pathType: Exact
         backend:
-          serviceName: product-composite
-          servicePort: 80
+          service: 
+            name: product-composite
+            port:
+              number: 80
