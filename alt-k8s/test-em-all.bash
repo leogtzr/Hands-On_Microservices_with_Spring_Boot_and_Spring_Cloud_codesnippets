@@ -184,14 +184,14 @@ function testCircuitBreaker() {
     else
         echo "Restarting alpine-client..."
         local ns=$NAMESPACE
-        if kubectl -n $ns get pod alpine-client > /dev/null ; then
-            kubectl -n $ns delete pod alpine-client --grace-period=1
+        if minikube kubectl -- -n $ns get pod alpine-client > /dev/null ; then
+            minikube kubectl -- -n $ns delete pod alpine-client --grace-period=1
         fi
-        kubectl -n $ns run --restart=Never alpine-client --image=alpine --command -- sleep 600
+        minikube kubectl -- -n $ns run --restart=Never alpine-client --image=alpine --command -- sleep 600
         echo "Waiting for alpine-client to be ready..."
-        kubectl -n $ns wait --for=condition=Ready pod/alpine-client
+        minikube kubectl -- -n $ns wait --for=condition=Ready pod/alpine-client
 
-        EXEC="kubectl -n $ns exec alpine-client --"
+        EXEC="minikube kubectl -- -n $ns exec alpine-client --"
     fi
 
     # First, use the health - endpoint to verify that the circuit breaker is closed
@@ -244,7 +244,7 @@ function testCircuitBreaker() {
     # Shutdown the client pod if we are using Kubernetes, i.e. not runnig on localhost. 
     if [ "$HOST" != "localhost" ]
     then
-        kubectl -n $ns delete pod alpine-client --grace-period=1
+        minikube kubectl -- -n $ns delete pod alpine-client --grace-period=1
     fi
 }
 

@@ -1,63 +1,64 @@
 #!/usr/bin/env bash
+alias | fgrep -i minikube kubectl
 
 # Print commands to the terminal before execution and stop the script if any error occurs
 set -ex
 
-minikube kb -- create configmap config-repo-auth-server       --from-file=config-repo/application.yml --from-file=config-repo/auth-server.yml --save-config
-minikube kb -- create configmap config-repo-gateway           --from-file=config-repo/application.yml --from-file=config-repo/gateway.yml --save-config
-minikube kb -- create configmap config-repo-product-composite --from-file=config-repo/application.yml --from-file=config-repo/product-composite.yml --save-config
-minikube kb -- create configmap config-repo-product           --from-file=config-repo/application.yml --from-file=config-repo/product.yml --save-config
-minikube kb -- create configmap config-repo-recommendation    --from-file=config-repo/application.yml --from-file=config-repo/recommendation.yml --save-config
-minikube kb -- create configmap config-repo-review            --from-file=config-repo/application.yml --from-file=config-repo/review.yml --save-config
+minikube kubectl -- create configmap config-repo-auth-server       --from-file=config-repo/application.yml --from-file=config-repo/auth-server.yml --save-config
+minikube kubectl -- create configmap config-repo-gateway           --from-file=config-repo/application.yml --from-file=config-repo/gateway.yml --save-config
+minikube kubectl -- create configmap config-repo-product-composite --from-file=config-repo/application.yml --from-file=config-repo/product-composite.yml --save-config
+minikube kubectl -- create configmap config-repo-product           --from-file=config-repo/application.yml --from-file=config-repo/product.yml --save-config
+minikube kubectl -- create configmap config-repo-recommendation    --from-file=config-repo/application.yml --from-file=config-repo/recommendation.yml --save-config
+minikube kubectl -- create configmap config-repo-review            --from-file=config-repo/application.yml --from-file=config-repo/review.yml --save-config
 
-minikube kb -- create secret generic rabbitmq-server-credentials \
+minikube kubectl -- create secret generic rabbitmq-server-credentials \
     --from-literal=RABBITMQ_DEFAULT_USER=rabbit-user-dev \
     --from-literal=RABBITMQ_DEFAULT_PASS=rabbit-pwd-dev \
     --save-config
 
-minikube kb -- create secret generic rabbitmq-credentials \
+minikube kubectl -- create secret generic rabbitmq-credentials \
     --from-literal=SPRING_RABBITMQ_USERNAME=rabbit-user-dev \
     --from-literal=SPRING_RABBITMQ_PASSWORD=rabbit-pwd-dev \
     --save-config
 
-minikube kb -- create secret generic rabbitmq-zipkin-credentials \
+minikube kubectl -- create secret generic rabbitmq-zipkin-credentials \
     --from-literal=RABBIT_USER=rabbit-user-dev \
     --from-literal=RABBIT_PASSWORD=rabbit-pwd-dev \
     --save-config
 
-minikube kb -- create secret generic mongodb-server-credentials \
+minikube kubectl -- create secret generic mongodb-server-credentials \
     --from-literal=MONGO_INITDB_ROOT_USERNAME=mongodb-user-dev \
     --from-literal=MONGO_INITDB_ROOT_PASSWORD=mongodb-pwd-dev \
     --save-config
 
-minikube kb -- create secret generic mongodb-credentials \
+minikube kubectl -- create secret generic mongodb-credentials \
     --from-literal=SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE=admin \
     --from-literal=SPRING_DATA_MONGODB_USERNAME=mongodb-user-dev \
     --from-literal=SPRING_DATA_MONGODB_PASSWORD=mongodb-pwd-dev \
     --save-config
 
-minikube kb -- create secret generic mysql-server-credentials \
+minikube kubectl -- create secret generic mysql-server-credentials \
     --from-literal=MYSQL_ROOT_PASSWORD=rootpwd \
     --from-literal=MYSQL_DATABASE=review-db \
     --from-literal=MYSQL_USER=mysql-user-dev \
     --from-literal=MYSQL_PASSWORD=mysql-pwd-dev \
     --save-config
 
-minikube kb -- create secret generic mysql-credentials \
+minikube kubectl -- create secret generic mysql-credentials \
     --from-literal=SPRING_DATASOURCE_USERNAME=mysql-user-dev \
     --from-literal=SPRING_DATASOURCE_PASSWORD=mysql-pwd-dev \
     --save-config
 
-minikube kb -- create secret tls tls-certificate --key kubernetes/cert/tls.key --cert kubernetes/cert/tls.crt
+minikube kubectl -- create secret tls tls-certificate --key kubernetes/cert/tls.key --cert kubernetes/cert/tls.crt
 
 # First deploy the resource managers and wait for their pods to become ready
-minikube kb -- apply -f kubernetes/services/overlays/dev/rabbitmq-dev.yml
-minikube kb -- apply -f kubernetes/services/overlays/dev/mongodb-dev.yml
-minikube kb -- apply -f kubernetes/services/overlays/dev/mysql-dev.yml
-minikube kb -- wait --timeout=600s --for=condition=ready pod --all
+minikube kubectl -- apply -f kubernetes/services/overlays/dev/rabbitmq-dev.yml
+minikube kubectl -- apply -f kubernetes/services/overlays/dev/mongodb-dev.yml
+minikube kubectl -- apply -f kubernetes/services/overlays/dev/mysql-dev.yml
+minikube kubectl -- wait --timeout=600s --for=condition=ready pod --all
 
 # Next deploy the microservices and wait for their pods to become ready
-minikube kb -- apply -k kubernetes/services/overlays/dev
-minikube kb -- wait --timeout=600s --for=condition=ready pod --all
+minikube kubectl -- apply -k kubernetes/services/overlays/dev
+minikube kubectl -- wait --timeout=600s --for=condition=ready pod --all
 
 set +ex
