@@ -26,7 +26,7 @@ spec:
           service:
             name: product-composite
             port: 
-              number: 80        
+              number: 80
       - path: /actuator/health
         pathType: Exact
         backend:

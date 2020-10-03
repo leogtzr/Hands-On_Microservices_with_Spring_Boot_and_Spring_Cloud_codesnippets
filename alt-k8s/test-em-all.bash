@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -x
 #
 # ./grdelw clean build
 # docker-compose build
