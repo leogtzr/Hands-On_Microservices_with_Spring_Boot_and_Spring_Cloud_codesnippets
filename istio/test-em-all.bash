@@ -1,24 +1,23 @@
 #!/usr/bin/env bash
-set -x
-#export HOST=86c83e8dc065.ngrok.io
-#export PORT=443
-
 #
-# ./grdelw clean build
+# ./gradlew clean build
 # docker-compose build
 # docker-compose up -d
 #
-# Sample usage:
+# Sample usage (for use with Docker Compose):
 #
-#   HOST=localhost PORT=7000 ./test-em-all.bash
+#   HOST=localhost PORT=8443 HEALTH_URL=https://localhost:8443 ./test-em-all.bash
 #
-: ${HOST=localhost}
-: ${PORT=8443}
+: ${HOST=minikube.me}
+: ${PORT=443}
+: ${HEALTH_URL=http://product-composite.hands-on.svc.cluster.local:4004}
+: ${MGM_PORT=4004}
 : ${PROD_ID_REVS_RECS=2}
 : ${PROD_ID_NOT_FOUND=13}
 : ${PROD_ID_NO_RECS=114}
 : ${PROD_ID_NO_REVS=214}
 : ${NAMESPACE=hands-on}
+: ${SKIP_CB_TESTS=false}
 
 function assertCurl() {
 
@@ -188,18 +187,18 @@ function testCircuitBreaker() {
     else
         echo "Restarting alpine-client..."
         local ns=$NAMESPACE
-        if minikube kubectl -- -n $ns get pod alpine-client > /dev/null ; then
-            minikube kubectl -- -n $ns delete pod alpine-client --grace-period=1
+        if kubectl -n $ns get pod alpine-client > /dev/null ; then
+            kubectl -n $ns delete pod alpine-client --grace-period=1
         fi
-        minikube kubectl -- -n $ns run --restart=Never alpine-client --image=alpine --command -- sleep 600
+        kubectl -n $ns run --restart=Never alpine-client --image=alpine --command -- sleep 600
         echo "Waiting for alpine-client to be ready..."
-        minikube kubectl -- -n $ns wait --for=condition=Ready pod/alpine-client
+        kubectl -n $ns wait --for=condition=Ready pod/alpine-client
 
-        EXEC="minikube kubectl -- -n $ns exec alpine-client --"
+        EXEC="kubectl -n $ns exec alpine-client --"
     fi
 
     # First, use the health - endpoint to verify that the circuit breaker is closed
-    assertEqual "CLOSED" "$($EXEC wget product-composite/actuator/health -qO - | jq -r .components.circuitBreakers.details.product.details.state)"
+    assertEqual "CLOSED" "$($EXEC wget product-composite:${MGM_PORT}/actuator/health -qO - | jq -r .components.circuitBreakers.details.product.details.state)"
 
     # Open the circuit breaker by running three slow calls in a row, i.e. that cause a timeout exception
     # Also, verify that we get 500 back and a timeout related error message
@@ -227,7 +226,7 @@ function testCircuitBreaker() {
     sleep 10
 
     # Verify that the circuit breaker is in half open state
-    assertEqual "HALF_OPEN" "$($EXEC wget product-composite/actuator/health -qO - | jq -r .components.circuitBreakers.details.product.details.state)"
+    assertEqual "HALF_OPEN" "$($EXEC wget product-composite:${MGM_PORT}/actuator/health -qO - | jq -r .components.circuitBreakers.details.product.details.state)"
 
     # Close the circuit breaker by running three normal calls in a row
     # Also, verify that we get 200 back and a response based on information in the product database
@@ -238,17 +237,17 @@ function testCircuitBreaker() {
     done
 
     # Verify that the circuit breaker is in closed state again
-    assertEqual "CLOSED" "$($EXEC wget product-composite/actuator/health -qO - | jq -r .components.circuitBreakers.details.product.details.state)"
+    assertEqual "CLOSED" "$($EXEC wget product-composite:${MGM_PORT}/actuator/health -qO - | jq -r .components.circuitBreakers.details.product.details.state)"
 
     # Verify that the expected state transitions happened in the circuit breaker
-    assertEqual "CLOSED_TO_OPEN"      "$($EXEC wget product-composite/actuator/circuitbreakerevents/product/STATE_TRANSITION -qO - | jq -r .circuitBreakerEvents[-3].stateTransition)"
-    assertEqual "OPEN_TO_HALF_OPEN"   "$($EXEC wget product-composite/actuator/circuitbreakerevents/product/STATE_TRANSITION -qO - | jq -r .circuitBreakerEvents[-2].stateTransition)"
-    assertEqual "HALF_OPEN_TO_CLOSED" "$($EXEC wget product-composite/actuator/circuitbreakerevents/product/STATE_TRANSITION -qO - | jq -r .circuitBreakerEvents[-1].stateTransition)"
+    assertEqual "CLOSED_TO_OPEN"      "$($EXEC wget product-composite:${MGM_PORT}/actuator/circuitbreakerevents/product/STATE_TRANSITION -qO - | jq -r .circuitBreakerEvents[-3].stateTransition)"
+    assertEqual "OPEN_TO_HALF_OPEN"   "$($EXEC wget product-composite:${MGM_PORT}/actuator/circuitbreakerevents/product/STATE_TRANSITION -qO - | jq -r .circuitBreakerEvents[-2].stateTransition)"
+    assertEqual "HALF_OPEN_TO_CLOSED" "$($EXEC wget product-composite:${MGM_PORT}/actuator/circuitbreakerevents/product/STATE_TRANSITION -qO - | jq -r .circuitBreakerEvents[-1].stateTransition)"
 
     # Shutdown the client pod if we are using Kubernetes, i.e. not runnig on localhost. 
     if [ "$HOST" != "localhost" ]
     then
-        minikube kubectl -- -n $ns delete pod alpine-client --grace-period=1
+        kubectl -n $ns delete pod alpine-client --grace-period=1
     fi
 }
 
@@ -258,6 +257,9 @@ echo "Start Tests:" `date`
 
 echo "HOST=${HOST}"
 echo "PORT=${PORT}"
+echo "HEALTH_URL=${HEALTH_URL}"
+echo "MGM_PORT=${MGM_PORT}"
+echo "SKIP_CB_TESTS=${SKIP_CB_TESTS}"
 
 if [[ $@ == *"start"* ]]
 then
@@ -268,7 +270,7 @@ then
     docker-compose up -d
 fi
 
-waitForService curl -k https://$HOST:$PORT/actuator/health
+waitForService curl -k $HEALTH_URL/actuator/health
 
 ACCESS_TOKEN=$(curl -k https://writer:secret@$HOST:$PORT/oauth/token -d grant_type=password -d username=magnus -d password=password -s | jq .access_token -r)
 AUTH="-H \"Authorization: Bearer $ACCESS_TOKEN\""
@@ -316,7 +318,10 @@ READER_AUTH="-H \"Authorization: Bearer $READER_ACCESS_TOKEN\""
 assertCurl 200 "curl -k https://$HOST:$PORT/product-composite/$PROD_ID_REVS_RECS $READER_AUTH -s"
 assertCurl 403 "curl -k https://$HOST:$PORT/product-composite/$PROD_ID_REVS_RECS $READER_AUTH -X DELETE -s"
 
-testCircuitBreaker
+if [[ $SKIP_CB_TESTS == "false" ]]
+then
+    testCircuitBreaker
+fi
 
 echo "End, all tests OK:" `date`
 
